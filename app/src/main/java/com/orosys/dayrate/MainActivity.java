@@ -14,5 +14,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         rateStar = findViewById(R.id.layout);
         rateStar.setStarImage(R.drawable.star);
+        rateStar.setRateStar(2.5f);
+        rateStar.setEnableHalf(true);
+        rateStar.setSpace(10);
+        rateStar.setRateCount(5);
+        rateStar.setBgAlpha(0.3f);
     }
 }

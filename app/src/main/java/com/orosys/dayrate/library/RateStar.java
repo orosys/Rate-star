@@ -1,5 +1,6 @@
 package com.orosys.dayrate.library;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -25,11 +26,12 @@ public class RateStar extends View {
     private static final String TAG = RateStarFrame.class.getSimpleName();
     private boolean isInit = false;
     private Bitmap starBitmap = null;
-    private float gap = 10;
-    private int count = 5;
+    private float space = 10;
+    private int rateCount = 5;
     private Point starSize;
     private float progress = 1;
     private float bgAlpha = 0.3f;
+    private boolean isEnableHalf = true;
 
     public RateStar(Context context) {
         super(context);
@@ -64,16 +66,29 @@ public class RateStar extends View {
         }
     }
 
-    public void setGap(float dp) {
-        this.gap = dpFromPx(getContext(), dp);
+    public void setSpace(float dp) {
+        this.space = dpFromPx(getContext(), dp);
     }
 
-    public void setCount(int count) {
-        this.count = count;
+    public void setRateCount(int count) {
+        this.rateCount = count;
     }
 
     public void setBgAlpha(float alpha) {
         this.bgAlpha = alpha;
+    }
+
+    public void setRateStar(float rate) {
+        progress = rate / this.rateCount;
+        invalidate();
+    }
+
+    public float getRateStar() {
+        return this.rateCount * progress;
+    }
+
+    public void setEnableHalf(boolean enableHalf) {
+        isEnableHalf = enableHalf;
     }
 
     @Override
@@ -96,6 +111,7 @@ public class RateStar extends View {
         setClickable(true);
     }
 
+    @SuppressLint("DrawAllocation")
     @Override
     protected void onDraw(Canvas canvas) {
         if (starBitmap == null) {
@@ -114,7 +130,7 @@ public class RateStar extends View {
         if (rect.width() == 0) {
             result = Bitmap.createBitmap(1, rect.height(), Bitmap.Config.ARGB_8888);
         } else {
-            result = Bitmap.createBitmap(rect.width(), rect.height(), Bitmap.Config.ARGB_8888);
+            result = Bitmap.createBitmap(rect.width() < 1 ? 1 : rect.width(), rect.height() < 1 ? 1 : rect.height(), Bitmap.Config.ARGB_8888);
         }
         Canvas tempCanvas = new Canvas(result);
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -122,8 +138,8 @@ public class RateStar extends View {
 
         Paint bgPaint = new Paint();
         bgPaint.setAlpha((int) (bgAlpha * 100));
-        for (int i = 0; i < count; i++) {
-            float x = (starSize.x + gap) * i;
+        for (int i = 0; i < rateCount; i++) {
+            float x = (starSize.x + space) * i;
             RectF rectF = new RectF(x, y, starSize.x + x, starSize.y + y);
             canvas.drawBitmap(starBitmap, null, rectF, bgPaint);
 
@@ -140,6 +156,7 @@ public class RateStar extends View {
         super.onDraw(canvas);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
@@ -160,9 +177,19 @@ public class RateStar extends View {
 
     private float updateStarPosition(float progress) {
         float position = 0;
-        for (int i = 0; i < (count * 2) + 1; i++) {
-            int x = (int) ((starSize.x * ((float) i / 2.0)) + (gap * (i / 2)));
-            if ((getWidth() * progress) > x - (starSize.x / 4) - gap) {
+        int count = this.rateCount;
+        if (isEnableHalf) {
+            count = count * 2;
+        }
+        for (int i = 0; i < count + 1; i++) {
+            int x = (int) ((starSize.x * ((float) (isEnableHalf ? i / 2.0 : i))) + (space * (isEnableHalf ? (i / 2) : i)));
+            int offset = 0;
+            if (isEnableHalf) {
+                if (i % 2 == 0) {
+                    offset = (int) space;
+                }
+            }
+            if ((getWidth() * progress) > x - (starSize.x / (isEnableHalf ? 4 : 2)) - offset) {
                 position = x;
             }
         }
@@ -172,9 +199,9 @@ public class RateStar extends View {
 
     public Point getStarSize() {
         Point size = new Point();
-        float gapSize = gap * (count - 1);
+        float gapSize = space * (rateCount - 1);
         int width = (int) (getWidth() - gapSize);
-        width /= count;
+        width /= rateCount;
         size.set(width, width);
         if (width > getHeight()) {
             size.set(getHeight(), getHeight());
