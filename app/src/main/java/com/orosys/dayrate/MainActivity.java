@@ -16,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
         rateStar.setStarImage(R.drawable.star);
         rateStar.setRateStar(2.5f);
         rateStar.setEnableHalf(true);
-        rateStar.setSpace(10);
+        rateStar.setSpace(100);
         rateStar.setRateCount(5);
         rateStar.setBgAlpha(0.3f);
     }
