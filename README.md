@@ -1,5 +1,6 @@
 # Rate Star
 - 별점 라이브러리.
+![Screen shot](https://github.com/orosys/Rate-star/blob/master/screen/GIF_20171222_134515.gif?raw=true)
 
 **API**
 >'RateStar'의 주요 API
